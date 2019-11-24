@@ -63,7 +63,7 @@ router.post('/', usersPostValidation, async (req, res) => {
 
     await user.save()
 
-    // return jsonwebtoken
+    // create payload to include in our jwt
     const payload = {
       user: {
         id: user.id
