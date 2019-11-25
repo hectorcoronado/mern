@@ -4,6 +4,7 @@ const config = require('config')
 const db = config.get('mongoURI')
 const options = {
   useCreateIndex: true,
+  useFindAndModify: false,
   useNewUrlParser: true,
   useUnifiedTopology: true
 }

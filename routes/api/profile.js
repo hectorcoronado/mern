@@ -129,4 +129,50 @@ router.post('/', createOrUpdateUserProfileValidation, async (req, res) => {
   }
 })
 
+/**
+ * @route GET api/profile/
+ * @desc get all profiles
+ * @access public
+ */
+router.get('/', async (req, res) => {
+  try {
+    // get profiles, and add the `name` and `avatar` fields from user collection
+    const profiles = await Profile.find().populate('user', ['name', 'avatar'])
+
+    res.json(profiles)
+  } catch (err) {
+    console.error(err.message)
+
+    res.status(500).send('server error')
+  }
+})
+
+/**
+ * @route GET api/profile/user/:user_id
+ * @desc get profile by user id
+ * @access public
+ */
+router.get('/user/:user_id', async (req, res) => {
+  try {
+    // get profile, and add the `name` and `avatar` fields from user collection
+    const profile = await Profile.findOne({
+      user: req.params.user_id
+    }).populate('user', ['name', 'avatar'])
+
+    if (!profile) return res.status(400).json({ msg: 'profile not found' })
+
+    res.json(profile)
+  } catch (err) {
+    console.error(err.message)
+
+    /**
+     * we need to check for a specific kind of message; if we enter in an invalid user id
+     */
+    if (err.kind === 'ObjectId') {
+      return res.status(400).json({ msg: 'profile not found' })
+    }
+
+    res.status(500).send('server error')
+  }
+})
 module.exports = router
