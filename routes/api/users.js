@@ -13,7 +13,7 @@ const User = require('../../models/User')
  * @desc register user
  * @access public
  */
-const usersPostValidation = [
+const registerUserValidation = [
   check('name', 'Name is required')
     .not()
     .isEmpty(),
@@ -23,7 +23,7 @@ const usersPostValidation = [
     'Please enter a password with 6 or more characters'
   ).isLength({ min: 6 })
 ]
-router.post('/', usersPostValidation, async (req, res) => {
+router.post('/', registerUserValidation, async (req, res) => {
   const errors = validationResult(req)
 
   if (!errors.isEmpty()) {
