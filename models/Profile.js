@@ -1,12 +1,13 @@
 const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
-const ProfileSchema = new mongoose.Schema({
+const ProfileSchema = new Schema({
   /**
    * since every profile will be associated with a user,
    * we need to create a reference to the User model
    */
   user: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'user'
   },
   bio: { type: String },
