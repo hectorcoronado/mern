@@ -1,4 +1,6 @@
+const config = require('config')
 const express = require('express')
+const request = require('request')
 const router = express.Router()
 const { check, validationResult } = require('express-validator/check')
 
@@ -268,7 +270,6 @@ router.put(
  * @desc delete experience from profile
  * @access private
  */
-
 router.delete('/experience/:exp_id', auth, async (req, res) => {
   try {
     // first of all, get profile of logged in user
@@ -366,7 +367,6 @@ router.put(
  * @desc delete experience from profile
  * @access private
  */
-
 router.delete('/education/:edu_id', auth, async (req, res) => {
   try {
     // first of all, get profile of logged in user
@@ -394,4 +394,35 @@ router.delete('/education/:edu_id', auth, async (req, res) => {
   }
 })
 
+/**
+ * @route GET api/profile/github/:username
+ * @desc get user repos from github
+ * @access public
+ */
+router.get('/github/:username', (req, res) => {
+  try {
+    const githubClientId = config.get('githubClientId')
+    const githubSecret = config.get('githubSecret')
+    const options = {
+      uri: `https://api.github.com/users/${req.params.username}/repos?per_page=5&sort=created:asc&client_id=${githubClientId}&client_secret=${githubSecret}`,
+      method: 'GET',
+      headers: { 'user-agent': 'node.js' }
+    }
+
+    request(options, (error, response, body) => {
+      if (error) console.error(error)
+
+      // we need to return here, otherwise there's a chance our server crashes
+      // with a `headers already sent` error
+      if (response.statusCode !== 200) {
+        return res.status(404).json({ msg: 'no github profile found' })
+      }
+
+      res.json(JSON.parse(body))
+    })
+  } catch (err) {
+    console.error(err.message)
+    res.status(500).send('server error')
+  }
+})
 module.exports = router
