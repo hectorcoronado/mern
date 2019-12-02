@@ -108,9 +108,6 @@ router.delete('/:id', auth, async (req, res) => {
      *  2. since `req.user.id` is a string, and `post.user` is ObjectId, convert it
      */ 
     if (post.user.toString() !== req.user.id) {
-
-      console.log('post.user:', post.user.toString())
-      console.log('req.user.id:', req.user.id)
       return res.status(401).json({ msg: 'user not authorized' })
     }
 
@@ -129,4 +126,74 @@ router.delete('/:id', auth, async (req, res) => {
   }
 })
 
+
+/**
+ * @route PUT api/posts/like/:id
+ * @desc  like a post
+ * @access private
+ */
+router.put('/like/:id', auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id)
+    /**
+     *  check if the post has already been liked by current user:
+     *  - `req.user.id` is the current logged in user
+     *  - the filter fn return something *only* if it matches, therefore check for length
+     *  - if length is greater than 0, it's already been 'liked'
+     */
+    if (post.likes.filter(like => like.user.toString() === req.user.id).length > 0)  {
+      return res.status(400).json({  msg: 'post already liked' })
+    }
+
+    /**
+     * if it hasn't been liked, 
+     * - add an object to the `likes` array, with a key of `user` and value of their `id`
+     * - this enables the above check for previous likes
+     */
+    post.likes.unshift({ user: req.user.id })
+
+    await post.save()
+
+    // and just return the likes so that we can access them in the front end/UI
+    res.json(post.likes)
+  } catch (err) {
+      console.error(err.message)
+      res.status(500).send('server error')
+  }
+})
+
+/**
+ * @route PUT api/posts/unlike/:id
+ * @desc  unlike a post
+ * @access private
+ */
+router.put('/unlike/:id', auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id)
+    /**
+     *  check if the post has already been liked by current user:
+     *  - `req.user.id` is the current logged in user
+     *  - the filter fn return something *only* if it matches, therefore check for length
+     *  - if length is equal to 0, the logged in user hasn't liked it yet, so there's nothing to do
+     */
+    if (post.likes.filter(like => like.user.toString() === req.user.id).length === 0)  {
+      return res.status(400).json({  msg: 'post has not yet been liked' })
+    }
+
+    // get index of like to be removed (this is very similar to `experience`)
+    const removeIndex = post.likes.map(like => like.user.toString()).indexOf(req.user.id)
+
+    // use `removeIndex` to splice 1 element from the `likes` array 
+    post.likes.splice(removeIndex, 1)
+
+
+    await post.save()
+
+    // and just return the likes so that we can access them in the front end/UI
+    res.json(post.likes)
+  } catch (err) {
+      console.error(err.message)
+      res.status(500).send('server error')
+  }
+})
 module.exports = router
