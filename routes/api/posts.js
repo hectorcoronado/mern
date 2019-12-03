@@ -21,6 +21,7 @@ router.post('/', [auth, createPostValidation], async (req, res) => {
   const errors = validationResult(req)
 
   if (!errors.isEmpty()) {
+    console.log(req)
     return res.status(400).json({ errors: errors.array() })
   }
 
@@ -126,6 +127,9 @@ router.delete('/:id', auth, async (req, res) => {
   }
 })
 
+/*********/
+/* LIKES */
+/*********/
 
 /**
  * @route PUT api/posts/like/:id
@@ -186,7 +190,6 @@ router.put('/unlike/:id', auth, async (req, res) => {
     // use `removeIndex` to splice 1 element from the `likes` array 
     post.likes.splice(removeIndex, 1)
 
-
     await post.save()
 
     // and just return the likes so that we can access them in the front end/UI
@@ -196,4 +199,88 @@ router.put('/unlike/:id', auth, async (req, res) => {
       res.status(500).send('server error')
   }
 })
+
+/************/
+/* COMMENTS */
+/************/
+
+/**
+ * @route POST api/posts/comment/:id
+ * @desc comment on a post
+ * @access private
+ */
+const createCommentValidation = [
+  check('text', 'text is required').not().isEmpty()
+]
+router.post('/comment/:id', [auth, createCommentValidation], async (req, res) => {
+  const errors = validationResult(req)
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() })
+  }
+
+  try {
+    // we will need the user's name, avatar (we're not sending it w/req, & we omt )
+    const user = await User.findById(req.user.id).select('-password')
+    const post = await Post.findById(req.params.id)
+
+    const newComment = {
+      text: req.body.text,
+      name: user.name,
+      avatar: user.avatar,
+      user: req.user.id
+    }
+
+    // add the new comment to the first index of comments array
+    post.comments.unshift(newComment)
+
+    await post.save()
+
+    res.json(post.comments)
+  } catch (err) {
+    console.error(err.message)
+    res.status(500).send('server error')
+  }
+})
+
+/**
+ * @route DELETE api/posts/comment/:id/:commentId
+ * @desc delete comment
+ * @access private
+ */
+router.delete('/comment/:id/:commentId', auth, async(req, res) => {
+  try {
+    const post = await Post.findById(req.params.id)
+
+    // pull out comment
+    const comment = post.comments.find(comment => comment.id === req.params.commentId)
+
+    // make sure comment exists
+    if (!comment) {
+      return res.status(404).json({ msg: 'comment does not exist' })
+    }
+
+    // check user (needs to be same user that made the comment)
+    if (comment.user.toString() !== req.user.id) {
+      return res.status(401).json({ msg: 'user not authorized' })
+    }
+
+
+    // get index of comment to be removed (this is very similar to `comment`s)
+    const removeIndex = post.comments.map(comment => comment.user.toString()).indexOf(req.user.id)
+
+    // use `removeIndex` to splice 1 element from the `comments` array 
+    post.comments.splice(removeIndex, 1)
+
+    await post.save()
+
+    // and just return the comments so that we can access them in the front end/UI
+    res.json(post.comments)
+    
+  } catch (err) {
+    console.error(err.message)
+    res.status(500).send('server error')
+  }
+})
+
 module.exports = router
