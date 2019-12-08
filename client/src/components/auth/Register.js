@@ -3,10 +3,11 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 
-// action
+// actions
 import { setAlert } from '../../actions/alert'
+import { register } from '../../actions/auth'
 
-const Register = ({ setAlert }) => {
+const Register = ({ register, setAlert }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -30,7 +31,9 @@ const Register = ({ setAlert }) => {
     if (password !== password2) {
       setAlert('passwords do not match', 'danger')
     } else {
-      console.log('success');
+      // call register action with the name, email, and password
+      // from our component's state
+      register({ name, email, password })
     }
   }
 
@@ -94,7 +97,8 @@ const Register = ({ setAlert }) => {
 }
 
 Register.propTypes = {
-  setAlert: PropTypes.func.isRequired,
+  register: PropTypes.func.isRequired,
+  setAlert: PropTypes.func.isRequired
 }
 
 /**
@@ -102,4 +106,4 @@ Register.propTypes = {
  * second is an object with any action we want to use -- this way,
  *  we can use e.g. `props.setAlert`
  */
-export default connect(null, { setAlert })(Register)
+export default connect(null, { register, setAlert })(Register)
