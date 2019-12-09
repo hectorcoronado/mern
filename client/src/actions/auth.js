@@ -1,13 +1,44 @@
 import axios from 'axios'
 
+// util function to include token on every request if token is available
+import setAuthToken from '../utils/setAuthToken'
+
 // types
 import {
+  AUTH_ERROR,
   REGISTER_FAIL,
-  REGISTER_SUCCESS
+  REGISTER_SUCCESS,
+  USER_LOADED
 } from './types'
 
 // alert action
 import { setAlert } from './alert'
+
+// load user
+/**
+ * we need to check if there is a user and if so, we need to assign
+ * them to a global header; if we have a token in localStorage,
+ * we *always* wanna send that
+ */
+export const loadUser = () => async dispatch => {
+  if (localStorage.token) {
+    setAuthToken(localStorage.token)
+  }
+
+  try {
+    const res = await axios.get('/api/auth')
+
+    // payload we pass in is the user
+    dispatch({
+      type: USER_LOADED,
+      payload: res.data
+    })
+  } catch (err) {
+    dispatch({
+      type: AUTH_ERROR
+    })
+  }
+}
 
 // register a user
 export const register = ({ name, email, password}) => async dispatch => {

@@ -1,6 +1,8 @@
 import {
+  AUTH_ERROR,
   REGISTER_FAIL,
-  REGISTER_SUCCESS
+  REGISTER_SUCCESS,
+  USER_LOADED
 } from '../actions/types'
 
 const initialState = {
@@ -23,14 +25,29 @@ export default function (state = initialState, action) {
         isAuthenticated: true,
         loading: false
       }
-    // if reg fails, assure token is removed from localStorage
+    // if reg or auth fails, assure token is removed from localStorage
     case REGISTER_FAIL:
+    case AUTH_ERROR:
       localStorage.removeItem('token')
       return {
         ...state,
         isAuthenticated: false,
         loading: false,
         token: null
+      }
+    /**
+     * if `loadUser`'s `try` runs, then this gets called, 
+     * setting `isAuthenticated` to true (the token worked);
+     * also sets `user` to payload, which includes name, email, avatar...,
+     * but *NOT* password, because in the backend, we wrote:
+     * const user = await User.findById(req.user.id).select('-password')
+     */
+    case USER_LOADED:
+      return {
+        ...state,
+        isAuthenticated: true,
+        loading: false,
+        user: payload
       }
     default: return state
   }
