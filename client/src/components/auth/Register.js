@@ -1,13 +1,13 @@
 import React, { Fragment, useState } from 'react'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom'
 import PropTypes from 'prop-types'
 
 // actions
 import { setAlert } from '../../actions/alert'
 import { register } from '../../actions/auth'
 
-const Register = ({ register, setAlert }) => {
+const Register = ({ isAuthenticated, register, setAlert }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -35,6 +35,11 @@ const Register = ({ register, setAlert }) => {
       // from our component's state
       register({ name, email, password })
     }
+  }
+
+  // redirect if registered by using <Redirect> from react-router:
+  if (isAuthenticated) {
+    return <Redirect to='/dashboard' />
   }
 
   return (
@@ -97,13 +102,20 @@ const Register = ({ register, setAlert }) => {
 }
 
 Register.propTypes = {
+  isAuthenticated: PropTypes.bool,
   register: PropTypes.func.isRequired,
   setAlert: PropTypes.func.isRequired
 }
+
+// we want to be able to read auth state to redirect after logging in
+const mapStateToProps = state => ({
+  // we get what we needed auth's state as defined in reducer!
+  isAuthenticated: state.auth.isAuthenticated
+})
 
 /**
  * first arg to connect is any state that needs to be mapped to props
  * second is an object with any action we want to use -- this way,
  *  we can use e.g. `props.setAlert`
  */
-export default connect(null, { register, setAlert })(Register)
+export default connect(mapStateToProps, { register, setAlert })(Register)

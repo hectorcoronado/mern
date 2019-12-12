@@ -1,5 +1,7 @@
 import {
   AUTH_ERROR,
+  LOGIN_FAIL,
+  LOGIN_SUCCESS,
   REGISTER_FAIL,
   REGISTER_SUCCESS,
   USER_LOADED
@@ -15,8 +17,9 @@ const initialState = {
 export default function (state = initialState, action) {
   const { type, payload } = action
   switch (type) {
-    // if reg'd ok, we get the token back and user should be
+    // if login'd/reg'd ok, we get the token back and user should be
     // logged in immediately
+    case LOGIN_SUCCESS:
     case REGISTER_SUCCESS:
       localStorage.setItem('token', payload.token)
       return {
@@ -25,9 +28,10 @@ export default function (state = initialState, action) {
         isAuthenticated: true,
         loading: false
       }
-    // if reg or auth fails, assure token is removed from localStorage
-    case REGISTER_FAIL:
+    // if log in, reg, or auth fails, assure token is removed from localStorage
     case AUTH_ERROR:
+    case LOGIN_FAIL:
+    case REGISTER_FAIL:
       localStorage.removeItem('token')
       return {
         ...state,

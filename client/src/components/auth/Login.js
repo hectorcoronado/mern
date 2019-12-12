@@ -1,7 +1,11 @@
 import React, { Fragment, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom'
+import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
 
-const Login = () => {
+import { login } from '../../actions/auth'
+
+const Login = ({ isAuthenticated, login }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -19,7 +23,14 @@ const Login = () => {
 
   const onSubmit = async e => {
     e.preventDefault()
-    console.log('success');
+
+    // in order to log in, we only need the user's email & password
+    login(email, password)
+  }
+
+  // redirect if logged in by using <Redirect> from react-router:
+  if (isAuthenticated) {
+    return <Redirect to='/dashboard' />
   }
 
   return (
@@ -57,4 +68,15 @@ const Login = () => {
   )
 }
 
-export default Login
+Login.propTypes = {
+  isAuthenticated: PropTypes.bool,
+  login: PropTypes.func.isRequired
+}
+
+// we want to be able to read auth state to redirect after logging in
+const mapStateToProps = state => ({
+  // we get what we needed auth's state as defined in reducer!
+  isAuthenticated: state.auth.isAuthenticated
+})
+
+export default connect(mapStateToProps, { login })(Login)
