@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 
 // components
 import Alert from './components/layout/Alert'
+import CreateProfile from './components/profile-forms/CreateProfile'
 import Dashboard from './components/dashboard/Dashboard'
 import Landing from './components/layout/Landing'
 import Login from './components/auth/Login'
@@ -47,6 +48,7 @@ const App = () => {
           <section className="container">
             <Alert />
             <Switch>
+              <PrivateRoute exact path='/create-profile' component={CreateProfile} />
               <PrivateRoute exact path='/dashboard' component={Dashboard} />
               <Route exact path='/login' component={Login} />
               <Route exact path='/register' component={Register} />
