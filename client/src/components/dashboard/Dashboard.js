@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 // components
+import DashboardActions from './DashboardActions'
 import Spinner from '../layout/Spinner'
 
 // actions
@@ -30,7 +31,7 @@ const Dashboard = ({
             {' '}Welcome { user && user.name }
           </p>
           { profile !== null
-              ? (<>has</>)
+              ? (<DashboardActions />)
               : (
                 <>
                   <p>You have not yet set up a profile, please add some info:</p>
