@@ -6,7 +6,8 @@ import { setAlert } from './alert'
 // types
 import {
   GET_PROFILE,
-  PROFILE_ERROR
+  PROFILE_ERROR,
+  UPDATE_PROFILE
 } from './types'
 
 // get current user's profile; called as soon as we reach dashboard page
@@ -60,6 +61,90 @@ export const createProfile = (formData, history, edit = false) => async dispatch
     if (!edit) {
       history.push('/dashboard')
     }
+  } catch (err) {
+    // when our server returns an error, it gets added to the
+    // `errors` array
+    const errors = err.response.data.errors
+
+    // if we receive erroneous response, we need to loop through
+    // the errors and set the appropriate alert.
+    if (errors) {
+      errors.forEach(error => dispatch(setAlert(error.msg, 'danger')))
+    }
+
+    dispatch({
+      type: PROFILE_ERROR,
+      payload: {
+        msg: err.response.statusText,
+        status: err.response.status
+      }
+    })
+  }
+}
+
+// add experience
+export const addExperience = (formData, history) => async dispatch => {
+  try {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+
+    const res = await axios.put('/api/profile/experience', formData, config)
+
+    dispatch({
+      type: UPDATE_PROFILE,
+      payload: res.data
+    })
+    
+    // set appropriate alert based on profile creation vs updating
+    dispatch(setAlert('Experience Added', 'success'))
+
+    history.push('/dashboard')
+
+  } catch (err) {
+    // when our server returns an error, it gets added to the
+    // `errors` array
+    const errors = err.response.data.errors
+
+    // if we receive erroneous response, we need to loop through
+    // the errors and set the appropriate alert.
+    if (errors) {
+      errors.forEach(error => dispatch(setAlert(error.msg, 'danger')))
+    }
+
+    dispatch({
+      type: PROFILE_ERROR,
+      payload: {
+        msg: err.response.statusText,
+        status: err.response.status
+      }
+    })
+  }
+}
+
+// add education
+export const addEducation = (formData, history) => async dispatch => {
+  try {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+
+    const res = await axios.put('/api/profile/education', formData, config)
+
+    dispatch({
+      type: UPDATE_PROFILE,
+      payload: res.data
+    })
+    
+    // set appropriate alert based on profile creation vs updating
+    dispatch(setAlert('Education Added', 'success'))
+
+    history.push('/dashboard')
+
   } catch (err) {
     // when our server returns an error, it gets added to the
     // `errors` array
