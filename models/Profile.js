@@ -21,7 +21,7 @@ const ProfileSchema = new Schema({
       fieldofstudy: { type: String, required: true },
       from: { type: Date, required: true },
       school: { type: String, required: true },
-      to: { type: Date, required: true }
+      to: { type: Date }
     }
   ],
   experience: [

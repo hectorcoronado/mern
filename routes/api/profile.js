@@ -6,6 +6,7 @@ const { check, validationResult } = require('express-validator/check')
 
 const auth = require('../../middleware/auth')
 
+const Post = require('../../models/Post')
 const Profile = require('../../models/Profile')
 const User = require('../../models/User')
 
@@ -185,11 +186,12 @@ router.get('/user/:user_id', async (req, res) => {
  */
 router.delete('/', auth, async (req, res) => {
   try {
-    // @todo - remove users posts
+    // remove all of the user's posts...
+    await Post.deleteMany({ user: req.user.id })
 
     /**
-     * remove profile
-     * this is a private method so we have access to the token
+     * ...then remove the user's profile
+     * (this is a private method, so we have access to the token)
      */
     await Profile.findOneAndRemove({ user: req.user.id })
     // ...and remove user
@@ -347,7 +349,7 @@ router.put(
     }
 
     try {
-      // first, fetch profile we want to add experience to
+      // first, fetch profile we want to add education to
       const profile = await Profile.findOne({ user: req.user.id })
 
       profile.education.unshift(newEdu)

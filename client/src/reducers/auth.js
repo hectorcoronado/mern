@@ -1,5 +1,6 @@
 import {
   AUTH_ERROR,
+  DELETE_ACCOUNT,
   LOGIN_FAIL,
   LOGIN_SUCCESS,
   LOGOUT,
@@ -29,8 +30,9 @@ export default function (state = initialState, action) {
         isAuthenticated: true,
         loading: false
       }
-    // if logging out or log in/reg/auth fails, assure token is removed from localStorage
+    // if deleting account, logging out, or log in/reg/auth fails, assure token is removed from localStorage
     case AUTH_ERROR:
+    case DELETE_ACCOUNT:
     case LOGIN_FAIL:
     case LOGOUT:
     case REGISTER_FAIL:
