@@ -11,6 +11,7 @@ import Dashboard from './components/dashboard/Dashboard'
 import Landing from './components/layout/Landing'
 import Login from './components/auth/Login'
 import Navbar from './components/layout/Navbar'
+import Profiles from './components/profiles/Profiles'
 import Register from './components/auth/Register'
 
 // higher-order-component
@@ -57,6 +58,7 @@ const App = () => {
               <PrivateRoute exact path='/dashboard' component={Dashboard} />
               <PrivateRoute exact path='/edit-profile' component={EditProfile} />
               <Route exact path='/login' component={Login} />
+              <Route exact path='/profiles' component={Profiles} />
               <Route exact path='/register' component={Register} />
             </Switch>
           </section>
