@@ -13,7 +13,7 @@ const Profiles = ({ getProfiles, profile: { profiles, loading }}) => {
   // as soon as this component loads, we need to call `getProfiles`
   useEffect(() => {
     getProfiles()
-  }, [])
+  }, [getProfiles])
 
   return (
     <>

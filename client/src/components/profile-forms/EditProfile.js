@@ -74,7 +74,7 @@ const EditProfile = ({
         youtube: loading || !profile.social ? '' : profile.social.youtube,
         website: loading || !profile.website ? '' : profile.website,
       })
-    }, [loading])
+    }, [getCurrentProfile, loading])
 
     return (
       <>
